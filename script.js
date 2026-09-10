@@ -126,8 +126,15 @@ function initAudio() {
     }
 }
 
-function playTone(frequency, duration, type = "sine", volume = 0.05) {
-    if (!soundEnabled || !audioContext) return;
+function playTone(
+    frequency,
+    duration,
+    type = "sine",
+    volume = 0.05
+) {
+    if (!soundEnabled || !audioContext) {
+        return;
+    }
 
     try {
         const oscillator = audioContext.createOscillator();
@@ -136,7 +143,11 @@ function playTone(frequency, duration, type = "sine", volume = 0.05) {
         oscillator.type = type;
         oscillator.frequency.value = frequency;
 
-        gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+        gainNode.gain.setValueAtTime(
+            volume,
+            audioContext.currentTime
+        );
+
         gainNode.gain.exponentialRampToValueAtTime(
             0.001,
             audioContext.currentTime + duration
@@ -146,33 +157,65 @@ function playTone(frequency, duration, type = "sine", volume = 0.05) {
         gainNode.connect(audioContext.destination);
 
         oscillator.start();
-        oscillator.stop(audioContext.currentTime + duration);
+        oscillator.stop(
+            audioContext.currentTime + duration
+        );
     } catch (error) {
         console.warn("Audio unavailable:", error);
     }
 }
 
 function playCorrectSound() {
-    playTone(523.25, 0.12, "sine", 0.05);
+    playTone(
+        523.25,
+        0.12,
+        "sine",
+        0.05
+    );
 
     setTimeout(() => {
-        playTone(659.25, 0.16, "sine", 0.05);
+        playTone(
+            659.25,
+            0.16,
+            "sine",
+            0.05
+        );
     }, 80);
 }
 
 function playWrongSound() {
-    playTone(180, 0.16, "triangle", 0.035);
+    playTone(
+        180,
+        0.16,
+        "triangle",
+        0.035
+    );
 }
 
 function playSuccessSound() {
-    playTone(523.25, 0.1, "sine", 0.04);
+    playTone(
+        523.25,
+        0.1,
+        "sine",
+        0.04
+    );
 
     setTimeout(() => {
-        playTone(659.25, 0.1, "sine", 0.04);
+        playTone(
+            659.25,
+            0.1,
+            "sine",
+            0.04
+        );
     }, 90);
 
     setTimeout(() => {
-        playTone(783.99, 0.18, "sine", 0.04);
+        playTone(
+            783.99,
+            0.18,
+            "sine",
+            0.04
+        );
     }, 180);
 }
 
@@ -226,13 +269,16 @@ function startGame() {
 function renderPuzzle() {
     const puzzle = puzzles[currentPuzzle];
 
-    if (!puzzle) return;
+    if (!puzzle) {
+        return;
+    }
 
     puzzleNumber.textContent = puzzle.number;
     puzzleTitle.textContent = puzzle.title;
     puzzleQuestion.textContent = puzzle.question;
 
     successMessage.textContent = "";
+    successMessage.innerHTML = "";
     successMessage.classList.remove("visible");
 
     continueButton.classList.remove("visible");
@@ -270,7 +316,9 @@ function handleAnswer(index, button) {
     const puzzle = puzzles[currentPuzzle];
 
     const allButtons =
-        optionsContainer.querySelectorAll(".answer-button");
+        optionsContainer.querySelectorAll(
+            ".answer-button"
+        );
 
     allButtons.forEach(btn => {
         btn.disabled = true;
@@ -280,10 +328,11 @@ function handleAnswer(index, button) {
         button.classList.add("correct");
 
         playCorrectSound();
-
         createSparkles();
 
-        successMessage.textContent = puzzle.success;
+        successMessage.textContent =
+            puzzle.success;
+
         successMessage.classList.add("visible");
 
         continueButton.classList.add("visible");
@@ -311,6 +360,7 @@ function renderMemoryQuestion(puzzle) {
     const note = document.createElement("p");
 
     note.className = "question-note";
+
     note.textContent =
         "No wrong answer. Seriously. I actually want the honest answer, whatever it is.";
 
@@ -319,12 +369,17 @@ function renderMemoryQuestion(puzzle) {
     puzzle.options.forEach(option => {
         const button = document.createElement("button");
 
-        button.className = "answer-button memory-answer";
+        button.className =
+            "answer-button memory-answer";
+
         button.type = "button";
         button.textContent = option;
 
         button.addEventListener("click", () => {
-            handleMemoryAnswer(option, button);
+            handleMemoryAnswer(
+                option,
+                button
+            );
         });
 
         optionsContainer.appendChild(button);
@@ -335,7 +390,9 @@ function handleMemoryAnswer(answer, button) {
     selectedMemoryAnswer = answer;
 
     const allButtons =
-        optionsContainer.querySelectorAll(".answer-button");
+        optionsContainer.querySelectorAll(
+            ".answer-button"
+        );
 
     allButtons.forEach(btn => {
         btn.disabled = true;
@@ -344,14 +401,22 @@ function handleMemoryAnswer(answer, button) {
     button.classList.add("selected");
 
     playCorrectSound();
-
     createSparkles();
 
     successMessage.innerHTML = `
         <div class="memory-result">
-            <div class="memory-result-label">Your answer</div>
-            <div class="memory-result-answer">${escapeHTML(answer)}</div>
-            <p>I wanted to know what you actually thought. So thank you for being honest. 🤍</p>
+            <div class="memory-result-label">
+                Your answer
+            </div>
+
+            <div class="memory-result-answer">
+                ${escapeHTML(answer)}
+            </div>
+
+            <p>
+                I wanted to know what you actually thought.
+                So thank you for being honest. 🤍
+            </p>
 
             <button
                 type="button"
@@ -366,12 +431,17 @@ function handleMemoryAnswer(answer, button) {
     successMessage.classList.add("visible");
 
     const whatsappButton =
-        document.getElementById("whatsapp-button");
+        document.getElementById(
+            "whatsapp-button"
+        );
 
     if (whatsappButton) {
-        whatsappButton.addEventListener("click", () => {
-            sendMemoryAnswer(answer);
-        });
+        whatsappButton.addEventListener(
+            "click",
+            () => {
+                sendMemoryAnswer(answer);
+            }
+        );
     }
 
     continueButton.classList.add("visible");
@@ -392,9 +462,14 @@ For the "dropping me home" question, I chose:
 That's my honest answer :)`;
 
     const whatsappURL =
-        `https://wa.me/?text=${encodeURIComponent(message)}`;
+        "https://wa.me/?text=" +
+        encodeURIComponent(message);
 
-    window.open(whatsappURL, "_blank", "noopener,noreferrer");
+    window.open(
+        whatsappURL,
+        "_blank",
+        "noopener,noreferrer"
+    );
 }
 
 
@@ -404,7 +479,9 @@ That's my honest answer :)`;
 
 function handleMoodAnswer(answer, button) {
     const allButtons =
-        optionsContainer.querySelectorAll(".answer-button");
+        optionsContainer.querySelectorAll(
+            ".answer-button"
+        );
 
     allButtons.forEach(btn => {
         btn.disabled = true;
@@ -414,7 +491,6 @@ function handleMoodAnswer(answer, button) {
         button.classList.add("correct");
 
         playCorrectSound();
-
         createSparkles();
 
         successMessage.textContent =
@@ -433,33 +509,65 @@ function handleMoodAnswer(answer, button) {
 
     document.body.classList.add("dimmed");
 
-    const sadMessage = document.createElement("div");
+    const existingSadMessage =
+        document.querySelector(
+            ".sad-message"
+        );
 
-    sadMessage.className = "sad-message";
+    if (existingSadMessage) {
+        existingSadMessage.remove();
+    }
+
+    const sadMessage =
+        document.createElement("div");
+
+    sadMessage.className =
+        "sad-message";
+
     sadMessage.innerHTML = `
-        <div class="sad-cat">😿</div>
-        <div>Aww don't be like that 😿</div>
-        <button type="button" class="mood-retry">
+        <div class="sad-cat">
+            😿
+        </div>
+
+        <div>
+            Aww don't be like that 😿
+        </div>
+
+        <button
+            type="button"
+            class="mood-retry"
+        >
             Okay okay… Good
         </button>
     `;
 
-    document.body.appendChild(sadMessage);
+    document.body.appendChild(
+        sadMessage
+    );
 
     const retryButton =
-        sadMessage.querySelector(".mood-retry");
+        sadMessage.querySelector(
+            ".mood-retry"
+        );
 
-    retryButton.addEventListener("click", () => {
-        document.body.classList.remove("dimmed");
+    retryButton.addEventListener(
+        "click",
+        () => {
+            document.body.classList.remove(
+                "dimmed"
+            );
 
-        sadMessage.remove();
+            sadMessage.remove();
 
-        allButtons.forEach(btn => {
-            btn.disabled = false;
-        });
+            allButtons.forEach(btn => {
+                btn.disabled = false;
+            });
 
-        button.classList.remove("wrong");
-    });
+            button.classList.remove(
+                "wrong"
+            );
+        }
+    );
 }
 
 
@@ -470,7 +578,10 @@ function handleMoodAnswer(answer, button) {
 function continueGame() {
     initAudio();
 
-    if (currentPuzzle < puzzles.length - 1) {
+    if (
+        currentPuzzle <
+        puzzles.length - 1
+    ) {
         currentPuzzle++;
 
         renderPuzzle();
@@ -501,7 +612,6 @@ function showFinal() {
     showScreen(finalScreen);
 
     playSuccessSound();
-
     createSparkles();
 }
 
@@ -516,10 +626,14 @@ function replayGame() {
     currentPuzzle = 0;
     selectedMemoryAnswer = "";
 
-    document.body.classList.remove("dimmed");
+    document.body.classList.remove(
+        "dimmed"
+    );
 
     const sadMessage =
-        document.querySelector(".sad-message");
+        document.querySelector(
+            ".sad-message"
+        );
 
     if (sadMessage) {
         sadMessage.remove();
@@ -534,13 +648,19 @@ function replayGame() {
    ========================================================= */
 
 function updateProgress() {
-    if (!progressBar) return;
+    if (!progressBar) {
+        return;
+    }
 
     const progress =
-        ((currentPuzzle) / puzzles.length) * 100;
+        (currentPuzzle / puzzles.length) *
+        100;
 
     progressBar.style.width =
-        `${Math.max(0, Math.min(progress, 100))}%`;
+        `${Math.max(
+            0,
+            Math.min(progress, 100)
+        )}%`;
 }
 
 
@@ -549,14 +669,18 @@ function updateProgress() {
    ========================================================= */
 
 function createSparkles() {
-    const container = document.createElement("div");
+    const container =
+        document.createElement("div");
 
-    container.className = "sparkle-container";
+    container.className =
+        "sparkle-container";
 
     for (let i = 0; i < 18; i++) {
-        const sparkle = document.createElement("span");
+        const sparkle =
+            document.createElement("span");
 
-        sparkle.className = "sparkle";
+        sparkle.className =
+            "sparkle";
 
         sparkle.style.left =
             `${Math.random() * 100}%`;
@@ -567,10 +691,14 @@ function createSparkles() {
         sparkle.style.animationDelay =
             `${Math.random() * 0.4}s`;
 
-        container.appendChild(sparkle);
+        container.appendChild(
+            sparkle
+        );
     }
 
-    document.body.appendChild(container);
+    document.body.appendChild(
+        container
+    );
 
     setTimeout(() => {
         container.remove();
@@ -583,7 +711,8 @@ function createSparkles() {
    ========================================================= */
 
 function escapeHTML(value) {
-    const div = document.createElement("div");
+    const div =
+        document.createElement("div");
 
     div.textContent = value;
 
@@ -600,7 +729,9 @@ function toggleSound() {
 
     if (soundToggle) {
         soundToggle.textContent =
-            soundEnabled ? "🔊" : "🔇";
+            soundEnabled
+                ? "🔊"
+                : "🔇";
 
         soundToggle.setAttribute(
             "aria-label",
@@ -612,7 +743,13 @@ function toggleSound() {
 
     if (soundEnabled) {
         initAudio();
-        playTone(440, 0.08, "sine", 0.03);
+
+        playTone(
+            440,
+            0.08,
+            "sine",
+            0.03
+        );
     }
 }
 
@@ -622,65 +759,72 @@ function toggleSound() {
    ========================================================= */
 
 if (startButton) {
-    startButton.addEventListener("click", startGame);
+    startButton.addEventListener(
+        "click",
+        startGame
+    );
 }
 
 if (continueButton) {
-    continueButton.addEventListener("click", continueGame);
+    continueButton.addEventListener(
+        "click",
+        continueGame
+    );
 }
 
 if (twistContinue) {
-    twistContinue.addEventListener("click", showFinal);
+    twistContinue.addEventListener(
+        "click",
+        showFinal
+    );
 }
 
 if (replayButton) {
-    replayButton.addEventListener("click", replayGame);
+    replayButton.addEventListener(
+        "click",
+        replayGame
+    );
 }
 
 if (finalReplay) {
-    finalReplay.addEventListener("click", replayGame);
+    finalReplay.addEventListener(
+        "click",
+        replayGame
+    );
 }
 
 if (soundToggle) {
-    soundToggle.addEventListener("click", toggleSound);
+    soundToggle.addEventListener(
+        "click",
+        toggleSound
+    );
 }
-
-
-/* =========================================================
-   MOOD QUESTION HANDLING
-   ========================================================= */
-
-document.addEventListener("click", event => {
-    const button = event.target.closest(".answer-button");
-
-    if (!button) return;
-
-    const puzzle = puzzles[currentPuzzle];
-
-    if (!puzzle || !puzzle.moodQuestion) return;
-
-    const answer = button.textContent.trim();
-
-    handleMoodAnswer(answer, button);
-});
 
 
 /* =========================================================
    KEYBOARD SUPPORT
    ========================================================= */
 
-document.addEventListener("keydown", event => {
-    if (event.key === "Enter") {
-        const focused = document.activeElement;
+document.addEventListener(
+    "keydown",
+    event => {
+        if (event.key !== "Enter") {
+            return;
+        }
+
+        const focused =
+            document.activeElement;
 
         if (
             focused &&
-            focused.classList.contains("answer-button")
+            focused.classList.contains(
+                "answer-button"
+            )
         ) {
             focused.click();
         }
     }
-});
+);
 
 
 /* =========================================================
