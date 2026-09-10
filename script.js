@@ -14,7 +14,8 @@ const puzzles = [
             "September 7"
         ],
         answer: 0,
-        success: "August 7. I remember now. And this time, I won't forget again."
+        success:
+            "August 7. I remember now. And this time, I won't forget again."
     },
 
     {
@@ -28,13 +29,15 @@ const puzzles = [
             "What’s Allen?"
         ],
         answer: 1,
-        success: "Exactly. No other answer was acceptable. 😂"
+        success:
+            "Exactly. No other answer was acceptable. 😂"
     },
 
     {
         number: "03",
         title: "Hydration",
-        question: "What was Rajasthan’s greatest contribution to our conversations?",
+        question:
+            "What was Rajasthan’s greatest contribution to our conversations?",
         options: [
             "Unlimited water",
             "Water shortage jokes",
@@ -42,13 +45,15 @@ const puzzles = [
             "Five-star hydration"
         ],
         answer: 1,
-        success: "Water shortage jokes. Honestly, we got more mileage out of that joke than Rajasthan got out of its water."
+        success:
+            "Water shortage jokes. Honestly, we got more mileage out of that joke than Rajasthan got out of its water."
     },
 
     {
         number: "04",
         title: "A little memory",
-        question: "When I used to drop you home after class in Allen… how did that actually make you feel?",
+        question:
+            "When I used to drop you home after class in Allen… how did that actually make you feel?",
         memoryQuestion: true,
         options: [
             "🫶 I liked it",
@@ -69,42 +74,92 @@ const puzzles = [
         moodQuestion: true,
         options: [
             "Good",
-            "Bad",
-           
+            "Bad"
         ]
     }
 ];
+
+
+/* =========================================================
+   STATE
+   ========================================================= */
 
 let currentPuzzle = 0;
 let selectedMemoryAnswer = "";
 let soundEnabled = true;
 let audioContext = null;
+let currentAffirmation = 0;
 
 
 /* =========================================================
    DOM ELEMENTS
    ========================================================= */
 
-const openingScreen = document.getElementById("opening-screen");
-const gameScreen = document.getElementById("game-screen");
-const twistScreen = document.getElementById("twist-screen");
-const finalScreen = document.getElementById("final-screen");
+const openingScreen = document.getElementById("opening");
+const gameScreen = document.getElementById("game");
+const twistScreen = document.getElementById("twist");
+const affirmationsScreen =
+    document.getElementById("affirmations");
+const finalScreen = document.getElementById("final");
 
-const startButton = document.getElementById("start-button");
-const continueButton = document.getElementById("continue-button");
-const replayButton = document.getElementById("replay-button");
+const startBtn = document.getElementById("startBtn");
+const twistNextBtn =
+    document.getElementById("twistNextBtn");
+const affirmationNextBtn =
+    document.getElementById("affirmationNextBtn");
+const replayBtn = document.getElementById("replayBtn");
 
-const puzzleNumber = document.getElementById("puzzle-number");
-const puzzleTitle = document.getElementById("puzzle-title");
-const puzzleQuestion = document.getElementById("puzzle-question");
-const optionsContainer = document.getElementById("options-container");
-const successMessage = document.getElementById("success-message");
+const gameContent =
+    document.getElementById("gameContent");
 
-const progressBar = document.getElementById("progress-bar");
-const soundToggle = document.getElementById("sound-toggle");
+const progressText =
+    document.getElementById("progressText");
 
-const twistContinue = document.getElementById("twist-continue");
-const finalReplay = document.getElementById("final-replay");
+const progressBar =
+    document.getElementById("progressBar");
+
+const soundToggle =
+    document.getElementById("soundToggle");
+
+const affirmationNumber =
+    document.getElementById("affirmationNumber");
+
+const affirmationEyebrow =
+    document.getElementById("affirmationEyebrow");
+
+const affirmationTitle =
+    document.getElementById("affirmationTitle");
+
+const affirmationText =
+    document.getElementById("affirmationText");
+
+
+/* =========================================================
+   AFFIRMATIONS
+   ========================================================= */
+
+const affirmations = [
+    {
+        eyebrow: "YOUR AMBITION",
+        title: "Your ambition.",
+        text:
+            "I hope you never make your dreams smaller just because they feel far away. You’re ambitious, and I genuinely like that about you. Keep going after the things you want."
+    },
+
+    {
+        eyebrow: "YOUR VOICE",
+        title: "Your voice.",
+        text:
+            "I like hearing you talk. Even when we're just talking about completely ordinary things, you somehow make the conversation better. I don't think you realize how nice that is."
+    },
+
+    {
+        eyebrow: "AND YOU",
+        title: "And you.",
+        text:
+            "You're beautiful. Probably more than you realize. And somehow, I don't think you always see yourself the way other people do."
+    }
+];
 
 
 /* =========================================================
@@ -114,17 +169,22 @@ const finalReplay = document.getElementById("final-replay");
 function initAudio() {
     if (!audioContext) {
         const AudioContext =
-            window.AudioContext || window.webkitAudioContext;
+            window.AudioContext ||
+            window.webkitAudioContext;
 
         if (AudioContext) {
             audioContext = new AudioContext();
         }
     }
 
-    if (audioContext && audioContext.state === "suspended") {
+    if (
+        audioContext &&
+        audioContext.state === "suspended"
+    ) {
         audioContext.resume();
     }
 }
+
 
 function playTone(
     frequency,
@@ -137,8 +197,11 @@ function playTone(
     }
 
     try {
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
+        const oscillator =
+            audioContext.createOscillator();
+
+        const gainNode =
+            audioContext.createGain();
 
         oscillator.type = type;
         oscillator.frequency.value = frequency;
@@ -157,6 +220,7 @@ function playTone(
         gainNode.connect(audioContext.destination);
 
         oscillator.start();
+
         oscillator.stop(
             audioContext.currentTime + duration
         );
@@ -164,6 +228,7 @@ function playTone(
         console.warn("Audio unavailable:", error);
     }
 }
+
 
 function playCorrectSound() {
     playTone(
@@ -183,6 +248,7 @@ function playCorrectSound() {
     }, 80);
 }
 
+
 function playWrongSound() {
     playTone(
         180,
@@ -191,6 +257,7 @@ function playWrongSound() {
         0.035
     );
 }
+
 
 function playSuccessSound() {
     playTone(
@@ -225,12 +292,15 @@ function playSuccessSound() {
    ========================================================= */
 
 function showScreen(screen) {
-    [
+    const screens = [
         openingScreen,
         gameScreen,
         twistScreen,
+        affirmationsScreen,
         finalScreen
-    ].forEach(element => {
+    ];
+
+    screens.forEach(element => {
         if (element) {
             element.classList.remove("active");
         }
@@ -269,42 +339,104 @@ function startGame() {
 function renderPuzzle() {
     const puzzle = puzzles[currentPuzzle];
 
-    if (!puzzle) {
+    if (!puzzle || !gameContent) {
         return;
     }
 
-    puzzleNumber.textContent = puzzle.number;
-    puzzleTitle.textContent = puzzle.title;
-    puzzleQuestion.textContent = puzzle.question;
-
-    successMessage.textContent = "";
-    successMessage.innerHTML = "";
-    successMessage.classList.remove("visible");
-
-    continueButton.classList.remove("visible");
-
-    optionsContainer.innerHTML = "";
+    gameContent.innerHTML = "";
 
     updateProgress();
 
+    const card =
+        document.createElement("div");
+
+    card.className = "question-card";
+
+
+    const number =
+        document.createElement("div");
+
+    number.className = "question-number";
+    number.textContent = puzzle.number;
+
+
+    const title =
+        document.createElement("h2");
+
+    title.textContent = puzzle.title;
+
+
+    const question =
+        document.createElement("p");
+
+    question.className =
+        "question-description";
+
+    question.textContent =
+        puzzle.question;
+
+
+    const answers =
+        document.createElement("div");
+
+    answers.className = "answers";
+
+
+    card.appendChild(number);
+    card.appendChild(title);
+    card.appendChild(question);
+    card.appendChild(answers);
+
+    gameContent.appendChild(card);
+
+
     if (puzzle.memoryQuestion) {
-        renderMemoryQuestion(puzzle);
+        renderMemoryQuestion(answers);
         return;
     }
 
-    puzzle.options.forEach((option, index) => {
-        const button = document.createElement("button");
 
-        button.className = "answer-button";
-        button.type = "button";
-        button.textContent = option;
+    if (puzzle.moodQuestion) {
+        renderMoodQuestion(answers);
+        return;
+    }
 
-        button.addEventListener("click", () => {
-            handleAnswer(index, button);
-        });
 
-        optionsContainer.appendChild(button);
-    });
+    puzzle.options.forEach(
+        (option, index) => {
+
+            const button =
+                createAnswerButton(option);
+
+            button.addEventListener(
+                "click",
+                () => {
+                    handleAnswer(
+                        index,
+                        button
+                    );
+                }
+            );
+
+            answers.appendChild(button);
+        }
+    );
+}
+
+
+/* =========================================================
+   CREATE ANSWER BUTTON
+   ========================================================= */
+
+function createAnswerButton(text) {
+    const button =
+        document.createElement("button");
+
+    button.type = "button";
+    button.className = "answer-btn";
+    button.textContent = text;
+
+    return button;
 }
 
 
@@ -313,41 +445,43 @@ function renderPuzzle() {
    ========================================================= */
 
 function handleAnswer(index, button) {
-    const puzzle = puzzles[currentPuzzle];
+    const puzzle =
+        puzzles[currentPuzzle];
 
     const allButtons =
-        optionsContainer.querySelectorAll(
-            ".answer-button"
+        gameContent.querySelectorAll(
+            ".answer-btn"
         );
 
-    allButtons.forEach(btn => {
-        btn.disabled = true;
-    });
 
     if (index === puzzle.answer) {
+
+        allButtons.forEach(btn => {
+            btn.disabled = true;
+        });
+
         button.classList.add("correct");
 
         playCorrectSound();
         createSparkles();
 
-        successMessage.textContent =
-            puzzle.success;
+        showSuccessMessage(
+            puzzle.success
+        );
 
-        successMessage.classList.add("visible");
+        createNextButton();
 
-        continueButton.classList.add("visible");
     } else {
+
         button.classList.add("wrong");
 
         playWrongSound();
 
         setTimeout(() => {
-            button.classList.remove("wrong");
-
-            allButtons.forEach(btn => {
-                btn.disabled = false;
-            });
-        }, 550);
+            button.classList.remove(
+                "wrong"
+            );
+        }, 500);
     }
 }
 
@@ -356,103 +490,133 @@ function handleAnswer(index, button) {
    MEMORY QUESTION
    ========================================================= */
 
-function renderMemoryQuestion(puzzle) {
-    const note = document.createElement("p");
+function renderMemoryQuestion(container) {
 
-    note.className = "question-note";
+    const note =
+        document.createElement("div");
+
+    note.className = "memory-note";
 
     note.textContent =
         "No wrong answer. Seriously. I actually want the honest answer, whatever it is.";
 
-    optionsContainer.appendChild(note);
+    container.appendChild(note);
 
-    puzzle.options.forEach(option => {
-        const button = document.createElement("button");
 
-        button.className =
-            "answer-button memory-answer";
+    puzzles[currentPuzzle].options.forEach(
+        option => {
 
-        button.type = "button";
-        button.textContent = option;
+            const button =
+                createAnswerButton(option);
 
-        button.addEventListener("click", () => {
-            handleMemoryAnswer(
-                option,
-                button
+            button.classList.add(
+                "memory-answer"
             );
-        });
 
-        optionsContainer.appendChild(button);
-    });
+            button.addEventListener(
+                "click",
+                () => {
+                    handleMemoryAnswer(
+                        option,
+                        button
+                    );
+                }
+            );
+
+            container.appendChild(button);
+        }
+    );
 }
 
-function handleMemoryAnswer(answer, button) {
+
+function handleMemoryAnswer(
+    answer,
+    button
+) {
     selectedMemoryAnswer = answer;
 
     const allButtons =
-        optionsContainer.querySelectorAll(
-            ".answer-button"
+        gameContent.querySelectorAll(
+            ".answer-btn"
         );
 
     allButtons.forEach(btn => {
         btn.disabled = true;
     });
 
-    button.classList.add("selected");
+    button.classList.add("correct");
 
     playCorrectSound();
     createSparkles();
 
-    successMessage.innerHTML = `
+
+    const message =
+        document.createElement("div");
+
+    message.className =
+        "success-message";
+
+
+    message.innerHTML = `
         <div class="memory-result">
-            <div class="memory-result-label">
-                Your answer
+
+            <div class="memory-result-title">
+                YOUR ANSWER
             </div>
 
-            <div class="memory-result-answer">
+            <div class="memory-result-text">
                 ${escapeHTML(answer)}
             </div>
 
-            <p>
+            <p style="margin-top:12px;">
                 I wanted to know what you actually thought.
                 So thank you for being honest. 🤍
             </p>
 
             <button
                 type="button"
-                class="whatsapp-button"
-                id="whatsapp-button"
+                class="whatsapp-btn"
+                id="whatsappBtn"
             >
                 Send my answer on WhatsApp ↗
             </button>
+
         </div>
     `;
 
-    successMessage.classList.add("visible");
 
-    const whatsappButton =
+    gameContent.appendChild(message);
+
+
+    const whatsappBtn =
         document.getElementById(
-            "whatsapp-button"
+            "whatsappBtn"
         );
 
-    if (whatsappButton) {
-        whatsappButton.addEventListener(
+
+    if (whatsappBtn) {
+
+        whatsappBtn.addEventListener(
             "click",
             () => {
-                sendMemoryAnswer(answer);
+                sendMemoryAnswer(
+                    answer
+                );
             }
         );
     }
 
-    continueButton.classList.add("visible");
+
+    createNextButton();
 }
 
 
 /* =========================================================
-   WHATSAPP SHARE
+   WHATSAPP
    ========================================================= */
 
 function sendMemoryAnswer(answer) {
+
     const message =
 `I played your little game 🤍
 
@@ -461,9 +625,11 @@ For the "dropping me home" question, I chose:
 
 That's my honest answer :)`;
 
+
     const whatsappURL =
         "https://wa.me/?text=" +
         encodeURIComponent(message);
+
 
     window.open(
         whatsappURL,
@@ -474,49 +640,101 @@ That's my honest answer :)`;
 
 
 /* =========================================================
-   LEVEL 5 — MOOD QUESTION
+   MOOD QUESTION
    ========================================================= */
 
-function handleMoodAnswer(answer, button) {
+function renderMoodQuestion(container) {
+
+    const moodButtons =
+        document.createElement("div");
+
+    moodButtons.className =
+        "mood-buttons";
+
+
+    puzzles[currentPuzzle].options.forEach(
+        option => {
+
+            const button =
+                createAnswerButton(option);
+
+            moodButtons.appendChild(
+                button
+            );
+
+
+            button.addEventListener(
+                "click",
+                () => {
+                    handleMoodAnswer(
+                        option,
+                        button
+                    );
+                }
+            );
+        }
+    );
+
+
+    container.appendChild(
+        moodButtons
+    );
+}
+
+
+function handleMoodAnswer(
+    answer,
+    button
+) {
+
     const allButtons =
-        optionsContainer.querySelectorAll(
-            ".answer-button"
+        gameContent.querySelectorAll(
+            ".answer-btn"
         );
 
-    allButtons.forEach(btn => {
-        btn.disabled = true;
-    });
 
     if (answer === "Good") {
-        button.classList.add("correct");
+
+        allButtons.forEach(btn => {
+            btn.disabled = true;
+        });
+
+        button.classList.add(
+            "correct"
+        );
 
         playCorrectSound();
         createSparkles();
 
-        successMessage.textContent =
-            "Good. That's what I wanted to hear. 🤍";
+        showSuccessMessage(
+            "Good. That's what I wanted to hear. 🤍"
+        );
 
-        successMessage.classList.add("visible");
-
-        continueButton.classList.add("visible");
+        createNextButton();
 
         return;
     }
+
 
     button.classList.add("wrong");
 
     playWrongSound();
 
-    document.body.classList.add("dimmed");
+    document.body.classList.add(
+        "dimmed"
+    );
 
-    const existingSadMessage =
+
+    const existing =
         document.querySelector(
             ".sad-message"
         );
 
-    if (existingSadMessage) {
-        existingSadMessage.remove();
+
+    if (existing) {
+        existing.remove();
     }
+
 
     const sadMessage =
         document.createElement("div");
@@ -524,44 +742,45 @@ function handleMoodAnswer(answer, button) {
     sadMessage.className =
         "sad-message";
 
+
     sadMessage.innerHTML = `
-        <div class="sad-cat">
+        <div class="sad-cat-face">
             😿
         </div>
 
-        <div>
+        <div class="sad-cat-text">
             Aww don't be like that 😿
         </div>
 
         <button
             type="button"
-            class="mood-retry"
+            class="primary-btn mood-retry"
         >
             Okay okay… Good
         </button>
     `;
 
+
     document.body.appendChild(
         sadMessage
     );
+
 
     const retryButton =
         sadMessage.querySelector(
             ".mood-retry"
         );
 
+
     retryButton.addEventListener(
         "click",
         () => {
+
             document.body.classList.remove(
                 "dimmed"
             );
 
             sadMessage.remove();
-
-            allButtons.forEach(btn => {
-                btn.disabled = false;
-            });
 
             button.classList.remove(
                 "wrong"
@@ -572,22 +791,86 @@ function handleMoodAnswer(answer, button) {
 
 
 /* =========================================================
+   SUCCESS MESSAGE
+   ========================================================= */
+
+function showSuccessMessage(text) {
+
+    const message =
+        document.createElement("div");
+
+    message.className =
+        "success-message";
+
+    message.textContent = text;
+
+    gameContent.appendChild(
+        message
+    );
+}
+
+
+/* =========================================================
+   NEXT BUTTON
+   ========================================================= */
+
+function createNextButton() {
+
+    const wrapper =
+        document.createElement("div");
+
+    wrapper.className =
+        "next-wrap";
+
+
+    const button =
+        document.createElement("button");
+
+    button.type = "button";
+
+    button.className =
+        "primary-btn";
+
+
+    button.innerHTML =
+        `Continue <span>→</span>`;
+
+
+    button.addEventListener(
+        "click",
+        continueGame
+    );
+
+
+    wrapper.appendChild(button);
+
+    gameContent.appendChild(
+        wrapper
+    );
+}
+
+
+/* =========================================================
    CONTINUE
    ========================================================= */
 
 function continueGame() {
+
     initAudio();
+
 
     if (
         currentPuzzle <
         puzzles.length - 1
     ) {
+
         currentPuzzle++;
 
         renderPuzzle();
 
         return;
     }
+
 
     playSuccessSound();
 
@@ -605,13 +888,85 @@ function showTwist() {
 
 
 /* =========================================================
+   AFFIRMATIONS
+   ========================================================= */
+
+function showAffirmations() {
+
+    currentAffirmation = 0;
+
+    renderAffirmation();
+
+    showScreen(
+        affirmationsScreen
+    );
+}
+
+
+function renderAffirmation() {
+
+    const item =
+        affirmations[
+            currentAffirmation
+        ];
+
+
+    if (!item) {
+        return;
+    }
+
+
+    affirmationNumber.textContent =
+        String(
+            currentAffirmation + 1
+        ).padStart(2, "0");
+
+
+    affirmationEyebrow.textContent =
+        item.eyebrow;
+
+
+    affirmationTitle.textContent =
+        item.title;
+
+
+    affirmationText.textContent =
+        item.text;
+}
+
+
+function nextAffirmation() {
+
+    currentAffirmation++;
+
+
+    if (
+        currentAffirmation >=
+        affirmations.length
+    ) {
+
+        showFinal();
+
+        return;
+    }
+
+
+    renderAffirmation();
+
+    createSparkles();
+}
+
+
+/* =========================================================
    FINAL
    ========================================================= */
 
 function showFinal() {
+
     showScreen(finalScreen);
 
     playSuccessSound();
+
     createSparkles();
 }
 
@@ -621,23 +976,29 @@ function showFinal() {
    ========================================================= */
 
 function replayGame() {
+
     initAudio();
 
     currentPuzzle = 0;
     selectedMemoryAnswer = "";
+    currentAffirmation = 0;
+
 
     document.body.classList.remove(
         "dimmed"
     );
+
 
     const sadMessage =
         document.querySelector(
             ".sad-message"
         );
 
+
     if (sadMessage) {
         sadMessage.remove();
     }
+
 
     showScreen(openingScreen);
 }
@@ -648,19 +1009,33 @@ function replayGame() {
    ========================================================= */
 
 function updateProgress() {
-    if (!progressBar) {
+
+    if (
+        !progressBar ||
+        !progressText
+    ) {
         return;
     }
 
+
+    const number =
+        currentPuzzle + 1;
+
+
+    progressText.textContent =
+        `${String(number).padStart(
+            2,
+            "0"
+        )} / 05`;
+
+
     const progress =
-        (currentPuzzle / puzzles.length) *
+        (number / puzzles.length) *
         100;
 
+
     progressBar.style.width =
-        `${Math.max(
-            0,
-            Math.min(progress, 100)
-        )}%`;
+        `${progress}%`;
 }
 
 
@@ -669,36 +1044,61 @@ function updateProgress() {
    ========================================================= */
 
 function createSparkles() {
+
     const container =
         document.createElement("div");
 
     container.className =
         "sparkle-container";
 
-    for (let i = 0; i < 18; i++) {
+
+    for (
+        let i = 0;
+        i < 18;
+        i++
+    ) {
+
         const sparkle =
             document.createElement("span");
 
         sparkle.className =
             "sparkle";
 
+
         sparkle.style.left =
             `${Math.random() * 100}%`;
+
 
         sparkle.style.top =
             `${Math.random() * 100}%`;
 
+
+        sparkle.style.setProperty(
+            "--x",
+            `${(Math.random() - 0.5) * 160}px`
+        );
+
+
+        sparkle.style.setProperty(
+            "--y",
+            `${(Math.random() - 0.5) * 160}px`
+        );
+
+
         sparkle.style.animationDelay =
             `${Math.random() * 0.4}s`;
+
 
         container.appendChild(
             sparkle
         );
     }
 
+
     document.body.appendChild(
         container
     );
+
 
     setTimeout(() => {
         container.remove();
@@ -711,6 +1111,7 @@ function createSparkles() {
    ========================================================= */
 
 function escapeHTML(value) {
+
     const div =
         document.createElement("div");
 
@@ -725,13 +1126,18 @@ function escapeHTML(value) {
    ========================================================= */
 
 function toggleSound() {
-    soundEnabled = !soundEnabled;
+
+    soundEnabled =
+        !soundEnabled;
+
 
     if (soundToggle) {
+
         soundToggle.textContent =
             soundEnabled
-                ? "🔊"
+                ? "♫"
                 : "🔇";
+
 
         soundToggle.setAttribute(
             "aria-label",
@@ -741,7 +1147,9 @@ function toggleSound() {
         );
     }
 
+
     if (soundEnabled) {
+
         initAudio();
 
         playTone(
@@ -758,73 +1166,49 @@ function toggleSound() {
    EVENT LISTENERS
    ========================================================= */
 
-if (startButton) {
-    startButton.addEventListener(
+if (startBtn) {
+
+    startBtn.addEventListener(
         "click",
         startGame
     );
 }
 
-if (continueButton) {
-    continueButton.addEventListener(
+
+if (twistNextBtn) {
+
+    twistNextBtn.addEventListener(
         "click",
-        continueGame
+        showAffirmations
     );
 }
 
-if (twistContinue) {
-    twistContinue.addEventListener(
+
+if (affirmationNextBtn) {
+
+    affirmationNextBtn.addEventListener(
         "click",
-        showFinal
+        nextAffirmation
     );
 }
 
-if (replayButton) {
-    replayButton.addEventListener(
+
+if (replayBtn) {
+
+    replayBtn.addEventListener(
         "click",
         replayGame
     );
 }
 
-if (finalReplay) {
-    finalReplay.addEventListener(
-        "click",
-        replayGame
-    );
-}
 
 if (soundToggle) {
+
     soundToggle.addEventListener(
         "click",
         toggleSound
     );
 }
-
-
-/* =========================================================
-   KEYBOARD SUPPORT
-   ========================================================= */
-
-document.addEventListener(
-    "keydown",
-    event => {
-        if (event.key !== "Enter") {
-            return;
-        }
-
-        const focused =
-            document.activeElement;
-
-        if (
-            focused &&
-            focused.classList.contains(
-                "answer-button"
-            )
-        ) {
-            focused.click();
-        }
-    }
-);
 
 
 /* =========================================================
