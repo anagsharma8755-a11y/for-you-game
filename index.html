@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080a12" />
+  <title>For You.</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <div class="grain"></div>
+
+  <main id="app">
+
+    <!-- OPENING -->
+    <section id="opening" class="screen active">
+      <div class="opening-content">
+        <div class="eyebrow">A little something</div>
+
+        <h1>Hey.</h1>
+
+        <p class="opening-main">I made you something.</p>
+
+        <p class="opening-sub">
+          It’s slightly stupid.<br />
+          But I put effort into it,<br />
+          so you have to play. :)
+        </p>
+
+        <button id="startBtn" class="primary-btn">
+          Start <span>→</span>
+        </button>
+      </div>
+    </section>
+
+
+    <!-- GAME -->
+    <section id="game" class="screen">
+
+      <header class="game-header">
+        <div class="game-label">A LITTLE GAME</div>
+
+        <div class="progress-wrapper">
+          <span id="progressText">01 / 05</span>
+          <div class="progress-track">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+        </div>
+
+        <button id="soundToggle" class="sound-toggle" aria-label="Toggle sound">
+          ♫
+        </button>
+      </header>
+
+      <div id="gameContent" class="game-content"></div>
+
+    </section>
+
+
+    <!-- TWIST -->
+    <section id="twist" class="screen">
+      <div class="twist-content">
+
+        <div class="eyebrow">You made it.</div>
+
+        <h2>But I wasn’t actually<br />testing your memory.</h2>
+
+        <p class="twist-line" id="twistLine1">
+          I just wanted an excuse to remind you of a few things.
+        </p>
+
+        <button id="twistNextBtn" class="primary-btn">
+          Continue <span>→</span>
+        </button>
+
+      </div>
+    </section>
+
+
+    <!-- AFFIRMATIONS -->
+    <section id="affirmations" class="screen">
+
+      <div class="affirmation-wrapper">
+
+        <div class="affirmation-counter">
+          <span id="affirmationNumber">01</span>
+          <span>/ 03</span>
+        </div>
+
+        <article id="affirmationCard" class="affirmation-card">
+
+          <div class="affirmation-eyebrow" id="affirmationEyebrow">
+            YOUR AMBITION
+          </div>
+
+          <h2 id="affirmationTitle">Your ambition.</h2>
+
+          <p id="affirmationText"></p>
+
+        </article>
+
+        <button id="affirmationNextBtn" class="primary-btn">
+          Next <span>→</span>
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- FINAL -->
+    <section id="final" class="screen">
+
+      <div class="final-content">
+
+        <div class="eyebrow">One last thing.</div>
+
+        <h1>I’m glad I<br />reconnected with you.</h1>
+
+        <div class="final-message">
+          <p>
+            It’s funny how someone can disappear from your everyday life
+            for a while and somehow find their way back.
+          </p>
+
+          <p>
+            I’m genuinely glad you did.
+          </p>
+
+          <p>
+            I like talking to you.<br />
+            I like remembering the stupid little things.
+          </p>
+
+          <p>
+            And I’m glad I made this.
+          </p>
+
+          <p class="final-last">
+            Maybe some things are worth coming back to.
+          </p>
+        </div>
+
+        <button id="replayBtn" class="secondary-btn">
+          Replay ↻
+        </button>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <div id="sparkleContainer"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
