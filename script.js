@@ -70,7 +70,7 @@ const puzzles = [
         options: [
             "Good",
             "Bad",
-            "No"
+           
         ]
     }
 ];
